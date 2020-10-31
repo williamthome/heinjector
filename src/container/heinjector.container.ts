@@ -7,9 +7,11 @@ import { Dependency, Property, ResolveOptions } from '@/interfaces'
 
 export class HeinJector {
   private _registers: RegisterMap
+  private _waitingForIdentifier: Map<PropertyName, Identifier<any>[]>
 
   constructor () {
     this._registers = new Map()
+    this._waitingForIdentifier = new Map()
   }
 
   private set = <T> (options: Registered<T>): void => {
@@ -24,14 +26,52 @@ export class HeinJector {
   public register = <T> (options: RegisterOptions<T>): void => {
     const { identifierConstructor, identifier, cache, isArray, dependencies } = options
 
-    if (!identifierConstructor && dependencies && dependencies.length > 0 && this.has(identifier))
-      this.pushDependency(identifier, ...dependencies)
-    else
-      this.set({
-        ...options,
-        cache: cache || isArray ? [] : undefined,
-        dependencies: dependencies || []
-      })
+    // If don't have constructor it's a parameter
+    if (!identifierConstructor && dependencies && dependencies.length > 0) {
+      // Property dependencies unknown their identifier
+      // because properties are registered before
+      const waitFor = dependencies[0].identifierName
+      const alreadyWaiting = this._waitingForIdentifier.get(waitFor) || []
+      this._waitingForIdentifier.set(waitFor, [identifier, ...alreadyWaiting])
+
+      // If property already registered
+      // just push dependencies
+      if (this.has(identifier)) {
+        this.pushDependency(identifier, ...dependencies)
+        return
+      }
+    // else it's a class
+    } else {
+      // Update dependencies identifier
+      if (this._waitingForIdentifier.size > 0) {
+        for (const [identifierName, propertyNames] of this._waitingForIdentifier) {
+          for (const propertyWaiting of propertyNames) {
+            if (identifierName !== identifierConstructor?.name) continue
+
+            const toUpdateIdentifier = this.getOrThrow(propertyWaiting)
+
+            for (const index in toUpdateIdentifier.dependencies) {
+              const dependency = toUpdateIdentifier.dependencies[index]
+
+              if (dependency.identifierName !== identifierConstructor.name) continue
+
+              dependency.identifier = identifier
+
+              toUpdateIdentifier.dependencies[index] = dependency
+            }
+
+            this.set(toUpdateIdentifier)
+          }
+        }
+        this._waitingForIdentifier.clear()
+      }
+    }
+
+    this.set({
+      ...options,
+      cache: cache || isArray ? [] : undefined,
+      dependencies: dependencies || []
+    })
   }
 
   private has = <T> (identifier: Identifier<T>): boolean =>
@@ -48,24 +88,7 @@ export class HeinJector {
     return registered
   }
 
-  private getByName = <T> (name: PropertyName): Registered<T> | undefined => {
-    for (const [, registered] of this._registers) {
-      if (registered.name === name) {
-        return registered
-      }
-    }
-    return undefined
-  }
-
-  private getByNameOrThrow = <T> (name: PropertyName): Registered<T> => {
-    const registered = this.getByName<T>(name)
-    if (!registered)
-      throw new Error(ERROR_MESSAGES.UNKNOWN_IDENTIFIER_NAME(name))
-
-    return registered
-  }
-
-  private pushDependency = <T> (identifier: Identifier<T>, ...dependency: Dependency[]): void => {
+  private pushDependency = <T> (identifier: Identifier<T>, ...dependency: Dependency<any>[]): void => {
     const registered = this.getOrThrow<T>(identifier)
     registered.dependencies.push(...dependency)
 
@@ -92,8 +115,8 @@ export class HeinJector {
     })
   }
 
-  private updateDependencyProperty = <T> (identifierName: PropertyName, { name, value }: Property<T>): void => {
-    const registered = this.getByNameOrThrow<T>(identifierName)
+  private updateDependencyProperty = <T> (identifier: Identifier<T>, { name, value }: Property<T>): void => {
+    const registered = this.getOrThrow<T>(identifier)
 
     this.updateProperty<T>(
       registered,
@@ -107,9 +130,14 @@ export class HeinJector {
   private updateDependencies = <T> (identifier: Identifier<T>): void => {
     const { dependencies, cache } = this.getOrThrow<T>(identifier)
 
-    for (const { identifierName, propertyName } of dependencies) {
+    for (const dependency of dependencies) {
+      const { identifier: dependencyIdentifier, propertyName } = dependency
+
+      if (!dependencyIdentifier)
+        throw new Error(ERROR_MESSAGES.NO_DEPENDENCY_IDENTIFIER(identifier, dependency))
+
       this.updateDependencyProperty(
-        identifierName,
+        dependencyIdentifier,
         {
           name: propertyName,
           value: cache
