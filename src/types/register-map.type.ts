@@ -1,3 +1,3 @@
-import { Identifier, RegisterOptions } from '.'
+import { Identifier, Registered } from '.'
 
-export type RegisterMap<T = any> = Map<Identifier<T>, RegisterOptions<T>>
+export type RegisterMap<T = any> = Map<Identifier<T>, Registered<T>>
