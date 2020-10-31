@@ -5,5 +5,5 @@ export interface Register<T> {
   name: PropertyName
   identifierConstructor?: Constructor<T>
   cache?: Value<T>
-  dependencies?: Dependency[]
+  dependencies?: Dependency<any>[]
 }
