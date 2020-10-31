@@ -203,4 +203,8 @@ export class HeinJector {
 
     return resolved
   }
+
+  public clear = (): void => {
+    this._registers.clear()
+  }
 }
