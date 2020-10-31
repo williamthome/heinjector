@@ -98,19 +98,19 @@ export class HeinJector {
   private updateProperty = <T> (registered: RegisterOptions<T>, { name, value }: Property<T>): void => {
     const { identifier, cache } = registered
 
-    if (!cache) return
+    const toUpdate = cache || this.resolve(identifier)
 
-    const cacheAsArray = toArray<T>(cache)
+    const toUpdateAsArray = toArray<T>(toUpdate)
 
-    for (const index in cacheAsArray) {
-      const toUpdate = cacheAsArray[index]
+    for (const index in toUpdateAsArray) {
+      const toUpdate = toUpdateAsArray[index]
       const updated = defineObjectProperty(toUpdate, name, value)
-      cacheAsArray[index] = updated
+      toUpdateAsArray[index] = updated
     }
 
     this.define({
       identifier,
-      value: cacheAsArray,
+      value: toUpdateAsArray,
       overrideIfArray: true
     })
   }
@@ -149,8 +149,8 @@ export class HeinJector {
   public define = <T> ({
     identifier,
     value,
-    overrideIfArray,
-    updateDependencies: updateCacheDependencies
+    overrideIfArray = false,
+    updateDependencies: updateCacheDependencies = true
   }: DefineOptions<T>): void => {
     const registered = this.getOrThrow<T>(identifier)
 
@@ -192,14 +192,17 @@ export class HeinJector {
   public resolve = <T> (identifier: Identifier<T>, options?: ResolveOptions): T | T[] => {
     const { identifierConstructor, cache, isArray } = this.getOrThrow<T>(identifier)
 
-    const useCache = typeof options?.useCache !== 'undefined' ? options.useCache : false
+    const useCache = typeof options?.useCache !== 'undefined' ? options.useCache : true
 
-    if (useCache || !identifierConstructor) {
+    if (!identifierConstructor) {
       if (!cache)
         throw new Error(ERROR_MESSAGES.CACHE_IS_FALSY(identifier))
 
       return cache
     }
+
+    if (useCache && cache)
+      return cache
 
     const valuesToResolve = toArray(cache || new identifierConstructor())
     const properties = this.getProperties(identifier)
