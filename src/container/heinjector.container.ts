@@ -192,7 +192,7 @@ export class HeinJector {
   public resolve = <T> (identifier: Identifier<T>, options?: ResolveOptions): T | T[] => {
     const { identifierConstructor, cache, isArray } = this.getOrThrow<T>(identifier)
 
-    const useCache = options ? options.useCache : false
+    const useCache = typeof options?.useCache !== 'undefined' ? options.useCache : false
 
     if (useCache || !identifierConstructor) {
       if (!cache)
@@ -220,7 +220,7 @@ export class HeinJector {
 
     const resolved = isArray ? valuesToResolve : valuesToResolve[0]
 
-    const override = options ? options.override : true
+    const override = typeof options?.override !== 'undefined' ? options.override : true
 
     if (override) {
       this.define({
