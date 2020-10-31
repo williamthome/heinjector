@@ -161,15 +161,19 @@ export class HeinJector {
     return properties
   }
 
-  public resolve = <T> (identifier: Identifier<T>, options?: ResolveOptions): Value<T> => {
-    const { identifierConstructor, cache: value, isArray } = this.getOrThrow<T>(identifier)
+  public resolve = <T> (identifier: Identifier<T>, options?: ResolveOptions): T | T[] => {
+    const { identifierConstructor, cache, isArray } = this.getOrThrow<T>(identifier)
 
     const useCache = options ? options.useCache : false
 
-    if (useCache || !identifierConstructor)
-      return value
+    if (useCache || !identifierConstructor) {
+      if (!cache)
+        throw new Error(ERROR_MESSAGES.CACHE_IS_FALSY(identifier))
 
-    const valuesToResolve = toArray(value || new identifierConstructor())
+      return cache
+    }
+
+    const valuesToResolve = toArray(cache || new identifierConstructor())
     const properties = this.getProperties(identifier)
 
     for (const index in valuesToResolve) {
