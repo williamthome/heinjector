@@ -1,37 +1,55 @@
 import heinjector, { Inject, Injectable } from '..'
 
-@Injectable({
-  identifier: 'Foo'
-})
 class Foo {
   constructor (
-    @Inject() public readonly foo: string,
-    @Inject({ isArray: true }) public readonly arrayfoo: string[],
-    @Inject() public readonly bar: string
+    public readonly foo: string,
+    public readonly arrayfoo: string[],
+    public readonly bar: string
   ) { }
 }
 
-@Injectable()
 class Bar {
   constructor (
-    @Inject({ identifier: 'Foo' }) public readonly foo: Foo,
-    @Inject({ isArray: true }) public readonly arrayfoo: string[],
-    @Inject() public readonly bar: string
+    public readonly foo: Foo,
+    public readonly arrayfoo: string[],
+    public readonly bar: string
   ) { }
 }
 
-@Injectable()
 class Foobar {
   constructor (
-    @Inject({ identifier: 'Foo' }) public readonly foo: Foo,
-    @Inject({ identifier: Bar }) public readonly bar: Bar,
-    @Inject({ identifier: 'foo' }) public readonly stringfoo: string,
-    @Inject({ isArray: true }) public readonly arrayfoo: string[],
-    @Inject({ identifier: 'bar' }) public readonly stringbar: string
+    public readonly foo: Foo,
+    public readonly bar: Bar,
+    public readonly stringfoo: string,
+    public readonly arrayfoo: string[],
+    public readonly stringbar: string
   ) { }
 }
 
 describe('HeinJector', () => {
+  beforeEach(() => {
+    Inject()(Foo, 'bar', 2)
+    Inject({ isArray: true })(Foo, 'arrayFoo', 1)
+    Inject()(Foo, 'foo', 0)
+    Injectable({ identifier: 'Foo' })(Foo)
+
+    Inject()(Bar, 'bar', 2)
+    Inject({ isArray: true })(Bar, 'arrayFoo', 1)
+    Inject({ identifier: 'Foo' })(Bar, 'foo', 0)
+    Injectable()(Bar)
+
+    Inject({ identifier: 'bar' })(Foobar, 'stringbar', 4)
+    Inject({ isArray: true })(Foobar, 'arrayFoo', 3)
+    Inject({ identifier: 'foo' })(Foobar, 'stringfoo', 2)
+    Inject({ identifier: Bar })(Foobar, 'bar', 1)
+    Inject({ identifier: 'Foo' })(Foobar, 'foo', 0)
+    Injectable()(Foobar)
+  })
+
+  afterEach(() => {
+    heinjector.clear()
+  })
+
   it('should inject, define, resolve and clear', () => {
 
     /// DEFINE VALUES
@@ -95,7 +113,8 @@ describe('HeinJector', () => {
     heinjector.define<string>({
       identifier: 'arrayfoo',
       value: 'My overrided arrayfoo',
-      overrideIfArray: true // <<
+      overrideIfArray: true, // <<
+      updateDependencies: false
     })
 
     const arrayfoo = heinjector.resolve<string>('arrayfoo') as string[]
