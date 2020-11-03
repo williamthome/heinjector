@@ -6,10 +6,12 @@
     "type": "git",
     "url": "https://github.com/williamthome/heinjector.git"
   },
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": ["lib/**/*"],
   "scripts": {
-    "build": "rimraf dist && npx tsc -p tsconfig.build.json",
-    "start": "node dist/index.js",
+    "build": "rimraf lib && npx tsc -p tsconfig.build.json",
+    "start": "node lib/index.js",
     "build:start": "npm run build && npm start",
     "test": "npx jest --passWithNoTests --silent --noStackTrace --runInBand --detectOpenHandles",
     "test:verbose": "npx jest --passWithNoTests --runInBand --detectOpenHandles",
@@ -45,8 +47,5 @@
   },
   "engines": {
     "node": "12.x"
-  },
-  "_moduleAliases": {
-    "@": "dist"
   }
 }
