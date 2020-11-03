@@ -6,9 +6,6 @@ export const defineObjectProperty = <T extends Record<string, any>, V> (
   propertyName: PropertyName,
   value: V
 ): T => {
-  if (!toUpdate)
-    throw new Error(ERROR_MESSAGES.OBJECT_IS_FALSY)
-
   if (!(propertyName in toUpdate))
     throw new Error(ERROR_MESSAGES.UNKNOWN_PROPERTY(propertyName))
 
