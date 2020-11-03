@@ -1,4 +1,4 @@
-import { Value } from '@/types'
+import { Value } from '../types'
 
 export const toArray = <T> (obj: Value<T>): T[] =>
   !obj

@@ -1,4 +1,4 @@
-import { Identifier } from '@/types'
+import { Identifier } from '../types'
 
 export interface InjectOptions<T> {
   identifier?: Identifier<T>

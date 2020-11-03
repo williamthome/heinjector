@@ -1,4 +1,4 @@
-import { Identifier, Value } from '@/types'
+import { Identifier, Value } from '../types'
 
 export interface UpdateOptions<T> {
   identifier: Identifier<T>

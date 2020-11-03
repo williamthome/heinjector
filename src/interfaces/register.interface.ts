@@ -1,5 +1,5 @@
 import { Dependency } from '.'
-import { Constructor, PropertyName, Value } from '@/types'
+import { Constructor, PropertyName, Value } from '../types'
 
 export interface Register<T> {
   name: PropertyName

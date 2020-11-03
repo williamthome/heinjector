@@ -1,6 +1,6 @@
-import { identifierToString } from '@/helpers/identifier.helper'
-import { Dependency } from '@/interfaces'
-import { Identifier, PropertyName } from '@/types'
+import { identifierToString } from '../helpers/identifier.helper'
+import { Dependency } from '../interfaces'
+import { Identifier, PropertyName } from '../types'
 
 export const ERROR_MESSAGES = {
   UNKNOWN_IDENTIFIER: <T> (

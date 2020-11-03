@@ -1,4 +1,4 @@
-import { Constructor } from '@/types'
+import { Constructor } from '../types'
 
 export const getArgumentNames = <T> (constructor: Constructor<T>): string[] => {
   const RegExInsideParentheses = /[(][^)]*[)]/

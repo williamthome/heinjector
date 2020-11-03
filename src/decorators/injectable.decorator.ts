@@ -1,8 +1,8 @@
 import heinjector from '..'
-import { symbols } from '@/helpers/proxy.helper'
-import { makeRegisterOptions } from '@/helpers/register.helper'
-import { InjectOptions } from '@/interfaces'
-import { Constructor } from '@/types'
+import { symbols } from '../helpers/proxy.helper'
+import { makeRegisterOptions } from '../helpers/register.helper'
+import { InjectOptions } from '../interfaces'
+import { Constructor } from '../types'
 
 export const Injectable = <P = any> (options?: InjectOptions<P>) => {
   return <T extends Constructor<P>> (

@@ -1,5 +1,5 @@
 import { isProxy } from './proxy.helper'
-import { Constructor, Identifier } from '@/types'
+import { Constructor, Identifier } from '../types'
 
 export const identifierToString = (identifier: Identifier<any>): string => {
   switch (typeof identifier) {

@@ -1,4 +1,4 @@
-import { Identifier, PropertyName } from '@/types'
+import { Identifier, PropertyName } from '../types'
 
 export interface Dependency<T> {
   identifierName: PropertyName

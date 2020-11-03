@@ -1,5 +1,5 @@
-import { PropertyName } from '@/types'
-import { ERROR_MESSAGES } from '@/constants'
+import { PropertyName } from '../types'
+import { ERROR_MESSAGES } from '../constants'
 
 export const defineObjectProperty = <T extends Record<string, any>, V> (
   toUpdate: T,

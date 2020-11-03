@@ -1,5 +1,5 @@
-import { InjectOptions } from '@/interfaces'
-import { Identifier } from '@/types'
+import { InjectOptions } from '../interfaces'
+import { Identifier } from '../types'
 
 type DefaultRegisterOptions<T> =
   Required<Omit<InjectOptions<T>, 'identifier'>> &

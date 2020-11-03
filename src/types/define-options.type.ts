@@ -1,3 +1,3 @@
-import { Define, UpdateOptions } from '@/interfaces'
+import { Define, UpdateOptions } from '../interfaces'
 
 export type DefineOptions<T> = Define & UpdateOptions<T>

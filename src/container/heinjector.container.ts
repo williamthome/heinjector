@@ -1,9 +1,9 @@
-import { ERROR_MESSAGES } from '@/constants'
-import { identifierAsMapKey, identifierToString } from '@/helpers/identifier.helper'
-import { setOrPush, toArray } from '@/helpers/value.helper'
-import { defineObjectProperty } from '@/helpers/object.helper'
-import { DefineOptions, Identifier, PropertyMap, PropertyName, Registered, RegisterMap, RegisterOptions, Value } from '@/types'
-import { Dependency, Property, ResolveOptions } from '@/interfaces'
+import { ERROR_MESSAGES } from '../constants'
+import { identifierAsMapKey, identifierToString } from '../helpers/identifier.helper'
+import { setOrPush, toArray } from '../helpers/value.helper'
+import { defineObjectProperty } from '../helpers/object.helper'
+import { DefineOptions, Identifier, PropertyMap, PropertyName, Registered, RegisterMap, RegisterOptions, Value } from '../types'
+import { Dependency, Property, ResolveOptions } from '../interfaces'
 
 export class HeinJector {
   private _registers: RegisterMap
