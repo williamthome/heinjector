@@ -2,6 +2,10 @@
   "name": "heinjector",
   "version": "0.0.1",
   "description": "Simple dependency injector",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/williamthome/heinjector.git"
+  },
   "main": "index.js",
   "scripts": {
     "build": "rimraf dist && npx tsc -p tsconfig.build.json",
