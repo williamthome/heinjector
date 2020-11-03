@@ -11,17 +11,9 @@
   "files": ["lib/**/*"],
   "scripts": {
     "build": "rimraf lib && npx tsc -p tsconfig.build.json",
-    "start": "node lib/index.js",
-    "build:start": "npm run build && npm start",
     "test": "npx jest --passWithNoTests --silent --noStackTrace --runInBand --detectOpenHandles",
     "test:verbose": "npx jest --passWithNoTests --runInBand --detectOpenHandles",
-    "test:unit": "npm test -- --watch \"^(.*/)*(.*\\.)*(spec)\\.ts$\"",
-    "test:unit:verbose": "npm run test:verbose -- --watch \"^(.*/)*(.*\\.)*(spec)\\.ts$\"",
-    "test:integration": "npm test -- --watch \"^(.*/)*(.*\\.)*(test)\\.ts$\"",
-    "test:integration:verbose": "npm run test:verbose -- --watch \"^(.*/)*(.*\\.)*(test)\\.ts$\"",
-    "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage",
-    "test:clear": "npx jest --clearCache"
+    "test:ci": "npm test -- --coverage"
   },
   "keywords": [
     "nodejs",
