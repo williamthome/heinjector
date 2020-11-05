@@ -9,7 +9,7 @@ export class HeinJector {
   private _registers: RegisterMap
   private _waitingForIdentifier: Map<PropertyName, Identifier<any>[]>
 
-  public testMode = false
+  public testMode = process.env.NODE_ENV ? process.env.NODE_ENV === 'test' : false
 
   constructor () {
     this._registers = new Map()
