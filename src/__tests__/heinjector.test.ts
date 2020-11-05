@@ -48,6 +48,18 @@ describe('HeinJector', () => {
 
   afterEach(() => {
     heinjector.clear()
+    heinjector.testMode = false
+  })
+
+  describe('define()', () => {
+    it('should throw if unregistered', () => {
+      expect(() => heinjector.define({ identifier: 'not', value: 'registered' })).toThrow()
+    })
+
+    it('should not throw if on test mode', () => {
+      heinjector.testMode = true
+      expect(() => heinjector.define({ identifier: 'not', value: 'registered' })).not.toThrow()
+    })
   })
 
   it('should inject, define, resolve and clear', () => {

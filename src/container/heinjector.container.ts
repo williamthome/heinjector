@@ -9,6 +9,8 @@ export class HeinJector {
   private _registers: RegisterMap
   private _waitingForIdentifier: Map<PropertyName, Identifier<any>[]>
 
+  public testMode = false
+
   constructor () {
     this._registers = new Map()
     this._waitingForIdentifier = new Map()
@@ -152,7 +154,16 @@ export class HeinJector {
     overrideIfArray = false,
     updateDependencies: updateCacheDependencies = true
   }: DefineOptions<T>): void => {
-    const registered = this.getOrThrow<T>(identifier)
+    const registered = this.get<T>(identifier)
+
+    if (!registered) {
+      if (this.testMode) {
+        console.warn(`Identifier ${identifierToString(identifier)} was not registered`)
+        return
+      } else {
+        throw new Error(ERROR_MESSAGES.UNKNOWN_IDENTIFIER(identifier))
+      }
+    }
 
     if (registered.isArray && overrideIfArray)
       registered.cache = toArray(value)
