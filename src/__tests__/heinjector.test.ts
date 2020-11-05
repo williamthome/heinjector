@@ -28,6 +28,8 @@ class Foobar {
 
 describe('HeinJector', () => {
   beforeEach(() => {
+    heinjector.testMode = false
+
     Inject()(Foo, 'bar', 2)
     Inject({ isArray: true })(Foo, 'arrayFoo', 1)
     Inject()(Foo, 'foo', 0)
