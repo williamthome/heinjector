@@ -20,7 +20,7 @@ export class HeinJector {
     const { identifier } = options
 
     this._registers.set(
-      identifierAsMapKey(identifier),
+      identifierToString(identifierAsMapKey(identifier)),
       options
     )
   }
@@ -77,10 +77,10 @@ export class HeinJector {
   }
 
   private has = <T> (identifier: Identifier<T>): boolean =>
-    this._registers.has(identifierAsMapKey(identifier))
+    this._registers.has(identifierToString(identifierAsMapKey(identifier)))
 
   private get = <T> (identifier: Identifier<T>): Registered<T> | undefined =>
-    this._registers.get(identifierAsMapKey(identifier))
+    this._registers.get(identifierToString(identifierAsMapKey(identifier)))
 
   private getOrThrow = <T> (identifier: Identifier<T>): Registered<T> => {
     const registered = this.get<T>(identifier)
