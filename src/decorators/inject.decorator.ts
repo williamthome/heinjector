@@ -1,6 +1,6 @@
 import heinjector from '..'
 import { getArgumentNames } from '../helpers/constructor.helper'
-import { makeRegisterOptions } from '../helpers/register.helper'
+import { makeInjectOptions } from '../helpers/register.helper'
 import { InjectOptions } from '../interfaces'
 import { Constructor } from '../types'
 
@@ -12,7 +12,7 @@ export const Inject = <TConstructor = any, TIdentifier = any> (options?: InjectO
   ): void => {
     const propertyName = getArgumentNames<TConstructor>(constructor)[parameterIndex]
 
-    const { identifier, isArray } = makeRegisterOptions<TIdentifier>(propertyName, options)
+    const { identifier, isArray } = makeInjectOptions<TIdentifier>(propertyName, options)
 
     heinjector.register({
       identifier,

@@ -1,14 +1,14 @@
 import heinjector from '..'
 import { symbols } from '../helpers/proxy.helper'
-import { makeRegisterOptions } from '../helpers/register.helper'
-import { InjectOptions } from '../interfaces'
+import { makeInjectableOptions } from '../helpers/register.helper'
+import { InjectableOptions } from '../interfaces'
 import { Constructor } from '../types'
 
-export const Injectable = <P = any> (options?: InjectOptions<P>) => {
+export const Injectable = <P = any> (options?: InjectableOptions<P>) => {
   return <T extends Constructor<P>> (
     constructor: T
   ): T => {
-    const { identifier, isArray } = makeRegisterOptions<P>(constructor, options)
+    const { identifier, isArray } = makeInjectableOptions<P>(constructor, options)
 
     heinjector.register({
       identifier,
@@ -22,7 +22,7 @@ export const Injectable = <P = any> (options?: InjectOptions<P>) => {
         const instance = Reflect.construct(target, args, newTarget)
 
         heinjector.define({
-          identifier,
+          identifier: Array.isArray(identifier) ? identifier[0] : identifier,
           value: instance
         })
 
