@@ -19,6 +19,7 @@ class Bar {
 class Foobar {
   constructor (
     public readonly foo: Foo,
+    public readonly foofoo: Foo,
     public readonly bar: Bar,
     public readonly stringfoo: string,
     public readonly arrayfoo: string[],
@@ -33,17 +34,18 @@ describe('HeinJector', () => {
     Inject()(Foo, 'bar', 2)
     Inject({ isArray: true })(Foo, 'arrayFoo', 1)
     Inject()(Foo, 'foo', 0)
-    Injectable({ identifier: 'Foo' })(Foo)
+    Injectable({ identifier: ['Foo', Foo] })(Foo)
 
     Inject()(Bar, 'bar', 2)
     Inject({ isArray: true })(Bar, 'arrayFoo', 1)
     Inject({ identifier: 'Foo' })(Bar, 'foo', 0)
     Injectable()(Bar)
 
-    Inject({ identifier: 'bar' })(Foobar, 'stringbar', 4)
-    Inject({ isArray: true })(Foobar, 'arrayFoo', 3)
-    Inject({ identifier: 'foo' })(Foobar, 'stringfoo', 2)
-    Inject({ identifier: Bar })(Foobar, 'bar', 1)
+    Inject({ identifier: 'bar' })(Foobar, 'stringbar', 5)
+    Inject({ isArray: true })(Foobar, 'arrayFoo', 4)
+    Inject({ identifier: 'foo' })(Foobar, 'stringfoo', 3)
+    Inject({ identifier: Bar })(Foobar, 'bar', 2)
+    Inject({ identifier: Foo })(Foobar, 'foofoo', 1)
     Inject({ identifier: 'Foo' })(Foobar, 'foo', 0)
     Injectable()(Foobar)
   })
@@ -113,6 +115,12 @@ describe('HeinJector', () => {
     expect(foobar.foo.arrayfoo).toBeTruthy()
     expect(foobar.foo.arrayfoo.length).toBe(3)
 
+    expect(foobar.foofoo).toBeTruthy()
+    expect(foobar.foofoo.bar).toBeTruthy()
+    expect(foobar.foofoo.foo).toBeTruthy()
+    expect(foobar.foofoo.arrayfoo).toBeTruthy()
+    expect(foobar.foofoo.arrayfoo.length).toBe(3)
+
     expect(foobar.bar).toBeTruthy()
     expect(foobar.bar.bar).toBeTruthy()
     expect(foobar.bar.foo.bar).toBeTruthy()
@@ -142,6 +150,9 @@ describe('HeinJector', () => {
     expect(foobar.foo.arrayfoo).toBeTruthy()
     expect(foobar.foo.arrayfoo.length).toBe(3)
 
+    expect(foobar.foofoo.arrayfoo).toBeTruthy()
+    expect(foobar.foofoo.arrayfoo.length).toBe(3)
+
     expect(foobar.bar.foo.arrayfoo).toBeTruthy()
     expect(foobar.bar.foo.arrayfoo.length).toBe(3)
     expect(foobar.bar.arrayfoo).toBeTruthy()
@@ -164,6 +175,9 @@ describe('HeinJector', () => {
 
     expect(foobar.foo.arrayfoo).toBeTruthy()
     expect(foobar.foo.arrayfoo.length).toBe(1)
+
+    expect(foobar.foofoo.arrayfoo).toBeTruthy()
+    expect(foobar.foofoo.arrayfoo.length).toBe(1)
 
     expect(foobar.bar.foo.arrayfoo).toBeTruthy()
     expect(foobar.bar.foo.arrayfoo.length).toBe(1)

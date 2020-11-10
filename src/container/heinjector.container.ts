@@ -20,7 +20,7 @@ export class HeinJector {
     const { identifier } = options
 
     this._registers.set(
-      identifierToString(identifierAsMapKey(identifier)),
+      identifier.map<string>(i => identifierToString(identifierAsMapKey(i))).join('.'),
       options
     )
   }
@@ -28,21 +28,25 @@ export class HeinJector {
   public register = <T> (options: RegisterOptions<T>): void => {
     const { identifierConstructor, identifier, cache, isArray, dependencies } = options
 
+    const dependencyIdentifier = Array.isArray(identifier)
+      ? identifier.map<string>(i => identifierToString(identifierAsMapKey(i))).join('.')
+      : identifierToString(identifier)
+
     // If don't have constructor it's a parameter
     if (!identifierConstructor && dependencies && dependencies.length > 0) {
       // Property dependencies unknown their identifier
       // because properties are registered before
       const waitFor = dependencies[0].identifierName
       const alreadyWaiting = this._waitingForIdentifier.get(waitFor) || []
-      this._waitingForIdentifier.set(waitFor, [identifier, ...alreadyWaiting])
+      this._waitingForIdentifier.set(waitFor, [dependencyIdentifier, ...alreadyWaiting])
 
       // If property already registered
       // just push dependencies
-      if (this.has(identifier)) {
-        this.pushDependency(identifier, ...dependencies)
+      if (this.has(dependencyIdentifier)) {
+        this.pushDependency(dependencyIdentifier, ...dependencies)
         return
       }
-    // else it's a class
+      // else it's a class
     } else {
       // Update dependencies identifier
       if (this._waitingForIdentifier.size > 0) {
@@ -57,7 +61,7 @@ export class HeinJector {
 
               if (dependency.identifierName !== identifierConstructor.name) continue
 
-              dependency.identifier = identifier
+              dependency.identifier = dependencyIdentifier
 
               toUpdateIdentifier.dependencies[index] = dependency
             }
@@ -71,16 +75,35 @@ export class HeinJector {
 
     this.set({
       ...options,
+      identifier: toArray(identifier),
       cache: cache || isArray ? [] : undefined,
       dependencies: dependencies || []
     })
   }
 
-  private has = <T> (identifier: Identifier<T>): boolean =>
-    this._registers.has(identifierToString(identifierAsMapKey(identifier)))
+  private has = <T> (identifier: Identifier<T>): boolean => {
+    if (typeof identifier === 'string' && identifier.includes('.'))
+      return this._registers.has(identifierToString(identifierAsMapKey(identifier)))
 
-  private get = <T> (identifier: Identifier<T>): Registered<T> | undefined =>
-    this._registers.get(identifierToString(identifierAsMapKey(identifier)))
+    for (const [key] of this._registers) {
+      const keys = key.split('.')
+      if (keys.some(k => k === identifierToString(identifierAsMapKey(identifier))))
+        return true
+    }
+    return false
+  }
+
+  private get = <T> (identifier: Identifier<T>): Registered<T> | undefined => {
+    if (typeof identifier === 'string' && identifier.includes('.'))
+      return this._registers.get(identifierToString(identifierAsMapKey(identifier)))
+
+    for (const [key, value] of this._registers) {
+      const keys = key.split('.')
+      if (keys.some(k => k === identifierToString(identifierAsMapKey(identifier))))
+        return value
+    }
+    return undefined
+  }
 
   private getOrThrow = <T> (identifier: Identifier<T>): Registered<T> => {
     const registered = this.get<T>(identifier)
@@ -97,8 +120,8 @@ export class HeinJector {
     this.set(registered)
   }
 
-  private updateProperty = <T> (registered: RegisterOptions<T>, { name, value }: Property<T>): void => {
-    const { identifier, cache } = registered
+  private updateProperty = <T> (identifier: Identifier<T>, registered: RegisterOptions<T>, { name, value }: Property<T>): void => {
+    const { cache } = registered
 
     const toUpdate = cache || this.resolve(identifier)
 
@@ -121,6 +144,7 @@ export class HeinJector {
     const registered = this.getOrThrow<T>(identifier)
 
     this.updateProperty<T>(
+      identifier,
       registered,
       {
         name,
@@ -129,8 +153,8 @@ export class HeinJector {
     )
   }
 
-  private updateDependencies = <T> (identifier: Identifier<T>): void => {
-    const { dependencies, cache } = this.getOrThrow<T>(identifier)
+  private updateDependencies = <T> (identifier: Identifier<T>, registered: Registered<T>): void => {
+    const { dependencies, cache } = registered
 
     for (const dependency of dependencies) {
       const { identifier: dependencyIdentifier, propertyName } = dependency
@@ -178,7 +202,7 @@ export class HeinJector {
     this.set(registered)
 
     if (updateCacheDependencies)
-      this.updateDependencies<T>(identifier)
+      this.updateDependencies<T>(identifier, registered)
   }
 
   private getProperties = <T> (identifier: Identifier<T>): PropertyMap<T> => {
